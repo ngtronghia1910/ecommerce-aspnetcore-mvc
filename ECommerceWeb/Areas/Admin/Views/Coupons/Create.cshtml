@@ -1,0 +1,63 @@
+@model ECommerceWeb.Models.ViewModels.CouponFormViewModel
+@using ECommerceWeb.Models
+@{
+    ViewData["Title"] = "Thêm mã giảm giá";
+}
+
+<h1 class="h4">Thêm mã giảm giá</h1>
+<p class="text-muted small">Thời gian nhập theo giờ Việt Nam (UTC+7).</p>
+<form asp-action="Create" method="post" class="col-lg-8">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="Code" class="form-label"></label>
+        <input asp-for="Code" class="form-control text-uppercase" autocomplete="off" />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="DiscountType" class="form-label"></label>
+        <select asp-for="DiscountType" class="form-select" asp-items="Html.GetEnumSelectList<CouponDiscountType>()"></select>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Value" class="form-label"></label>
+        <input asp-for="Value" class="form-control" />
+        <span asp-validation-for="Value" class="text-danger"></span>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="MinOrderValue" class="form-label"></label>
+            <input asp-for="MinOrderValue" class="form-control" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="MaxDiscountAmount" class="form-label"></label>
+            <input asp-for="MaxDiscountAmount" class="form-control" />
+            <span class="form-text">Chỉ áp dụng khi loại là %.</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="StartDateLocal" class="form-label"></label>
+            <input asp-for="StartDateLocal" type="datetime-local" class="form-control" />
+            <span asp-validation-for="StartDateLocal" class="text-danger"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="EndDateLocal" class="form-label"></label>
+            <input asp-for="EndDateLocal" type="datetime-local" class="form-control" />
+            <span asp-validation-for="EndDateLocal" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label asp-for="UsageLimit" class="form-label"></label>
+        <input asp-for="UsageLimit" class="form-control" />
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label"></label>
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

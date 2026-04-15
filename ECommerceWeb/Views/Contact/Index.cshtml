@@ -1,0 +1,48 @@
+@model ContactViewModel
+@{
+    ViewData["Title"] = "Liên hệ";
+}
+
+<h1 class="h3 mb-4">Liên hệ</h1>
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form asp-controller="Contact" asp-action="Index" method="post" novalidate data-loading>
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control" autocomplete="name" />
+                        <span asp-validation-for="Name" class="field-validation-error"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" autocomplete="email" />
+                        <span asp-validation-for="Email" class="field-validation-error"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Message" class="form-label"></label>
+                        <textarea asp-for="Message" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="Message" class="field-validation-error"></span>
+                    </div>
+                    <button type="submit" class="btn btn-brand btn-cta">Gửi tin nhắn</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card border-0 bg-light h-100">
+            <div class="card-body p-4">
+                <h2 class="h6 text-uppercase text-secondary mb-3">Thông tin</h2>
+                <p class="small mb-2"><strong>Địa chỉ:</strong> Hà Nội, Việt Nam</p>
+                <p class="small mb-2"><strong>Hotline:</strong> 1900 0000</p>
+                <p class="small mb-0"><strong>Email:</strong> support@shopmvc.local</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

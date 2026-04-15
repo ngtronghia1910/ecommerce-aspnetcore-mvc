@@ -1,0 +1,92 @@
+@model IList<CartItem>
+@using ECommerceWeb.Models
+@{
+    ViewData["Title"] = "Giỏ hàng";
+    var total = Model.Sum(c => ProductPricing.GetEffectiveUnitPrice(c.Product!) * c.Quantity);
+}
+
+<h1 class="h3 mb-4">Giỏ hàng</h1>
+
+@if (!Model.Any())
+{
+    <div class="empty-state card border-0 shadow-sm">
+        <div class="empty-state-icon" aria-hidden="true">🛒</div>
+        <h2 class="h5 text-dark">Giỏ hàng trống</h2>
+        <p class="mb-3">Thêm sản phẩm để tiếp tục mua sắm.</p>
+        <a class="btn btn-brand" asp-controller="Products" asp-action="Index">Khám phá sản phẩm</a>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="table-responsive card border-0 shadow-sm">
+                <table class="table table-hover align-middle mb-0" data-cart-table>
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Sản phẩm</th>
+                            <th scope="col" class="text-end">Đơn giá</th>
+                            <th scope="col" style="width:8rem">SL</th>
+                            <th scope="col" class="text-end">Thành tiền</th>
+                            <th scope="col" style="width:4rem"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in Model)
+                        {
+                            var p = line.Product!;
+                            var unitEff = ProductPricing.GetEffectiveUnitPrice(p);
+                            var hasDisc = ProductPricing.HasDiscount(p);
+                            var unit = (double)unitEff;
+                            <tr data-cart-line data-unit-price="@unit.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                                <td class="fw-semibold">@p.Name</td>
+                                <td class="text-end">
+                                    @if (hasDisc)
+                                    {
+                                        <div><del class="text-muted small d-block">@p.Price.ToString("N0") đ</del></div>
+                                    }
+                                    <span>@unitEff.ToString("N0") đ</span>
+                                </td>
+                                <td>
+                                    <form asp-action="Update" method="post" class="d-flex gap-1 align-items-center">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@line.Id" />
+                                        <input type="number" name="quantity" value="@line.Quantity" min="1" max="@p.Stock" class="form-control form-control-sm" data-line-qty />
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Cập nhật">OK</button>
+                                    </form>
+                                </td>
+                                <td class="text-end fw-bold text-brand" data-line-total>@((unitEff * line.Quantity).ToString("N0")) đ</td>
+                                <td>
+                                    <form asp-action="Remove" method="post" onsubmit="return confirm('Xóa sản phẩm này khỏi giỏ?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@line.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Xóa">×</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-lg-top" style="top: 5.5rem;">
+                <div class="card-body p-4">
+                    <h2 class="h6 text-uppercase text-secondary mb-3">Tóm tắt</h2>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tạm tính</span>
+                        <span data-cart-grand>@total.ToString("N0") đ</span>
+                    </div>
+                    <p class="small text-muted mb-2">Mã giảm giá áp dụng tại bước thanh toán.</p>
+                    <hr />
+                    <div class="d-flex justify-content-between fs-5 fw-bold mb-4">
+                        <span>Tổng cộng</span>
+                        <span class="text-brand" data-cart-grand>@total.ToString("N0") đ</span>
+                    </div>
+                    <a class="btn btn-cta w-100 mb-2" asp-controller="Orders" asp-action="Checkout">Thanh toán</a>
+                    <a class="btn btn-outline-secondary w-100" asp-controller="Products" asp-action="Index">Tiếp tục mua</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,66 @@
+@model IList<Order>
+@{
+    ViewData["Title"] = "Đơn hàng của tôi";
+    string StatusVi(OrderStatus s) => s switch
+    {
+        OrderStatus.Pending => "Chờ xử lý",
+        OrderStatus.Processing => "Đang xử lý",
+        OrderStatus.Shipped => "Đang giao",
+        OrderStatus.Delivered => "Hoàn thành",
+        OrderStatus.Cancelled => "Đã hủy",
+        OrderStatus.AwaitingPayment => "Chờ thanh toán online",
+        _ => s.ToString()
+    };
+    string PayVi(PaymentMethod m) => m switch
+    {
+        PaymentMethod.Cod => "COD",
+        PaymentMethod.VNPay => "VNPay",
+        PaymentMethod.Momo => "MoMo",
+        _ => m.ToString()
+    };
+    string PayStatusVi(PaymentStatus p) => p switch
+    {
+        PaymentStatus.None => "—",
+        PaymentStatus.Pending => "Chờ thanh toán",
+        PaymentStatus.Paid => "Đã thanh toán",
+        PaymentStatus.Failed => "Thanh toán lỗi",
+        _ => p.ToString()
+    };
+}
+
+<h1 class="h3 mb-3">Lịch sử đơn hàng</h1>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">Bạn chưa có đơn hàng nào.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Ngày</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Thanh toán</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var o in Model)
+                {
+                    <tr>
+                        <td>#@o.Id</td>
+                        <td>@o.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@o.TotalAmount.ToString("N0") đ</td>
+                        <td>@StatusVi(o.Status)</td>
+                        <td><span class="small">@PayVi(o.PaymentMethod)</span><br /><span class="small text-muted">@PayStatusVi(o.PaymentStatus)</span></td>
+                        <td><a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@o.Id">Chi tiết</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

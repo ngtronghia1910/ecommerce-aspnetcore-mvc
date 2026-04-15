@@ -1,0 +1,19 @@
+@model IList<UserListItemViewModel>
+@{
+    ViewData["Title"] = "Người dùng";
+}
+
+<h1 class="h3 mb-3">Người dùng</h1>
+<table class="table table-striped bg-white">
+    <thead><tr><th>Email</th><th>Họ tên</th><th>Vai trò</th></tr></thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.Email</td>
+                <td>@u.FullName</td>
+                <td>@u.Roles</td>
+            </tr>
+        }
+    </tbody>
+</table>

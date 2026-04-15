@@ -1,0 +1,85 @@
+@model HomePageViewModel
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<div id="carouselHero" class="carousel slide hero-carousel mb-4 rounded-3 overflow-hidden shadow" data-bs-ride="carousel" aria-label="Khuyến mãi">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselHero" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselHero" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    </div>
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <div class="hero-slide-inner">
+                <h2 class="display-6 mb-3">Ưu đãi mùa mới</h2>
+                <p class="lead opacity-90 mb-4">Giảm thêm khi thanh toán VNPay / MoMo — giao nhanh toàn quốc.</p>
+                <a class="btn btn-cta btn-lg" asp-controller="Products" asp-action="Index">Mua ngay</a>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="hero-slide-inner">
+                <h2 class="display-6 mb-3">Đổi trả trong 7 ngày</h2>
+                <p class="lead opacity-90 mb-4">Cam kết sản phẩm chính hãng, hỗ trợ 24/7.</p>
+                <a class="btn btn-light btn-lg text-dark fw-bold" asp-controller="Home" asp-action="ReturnPolicy">Xem chính sách</a>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselHero" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Trước</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselHero" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Sau</span>
+    </button>
+</div>
+
+<section class="promo-strip p-3 p-md-4 mb-5 text-center shadow-sm">
+    <p class="mb-0 fw-semibold">🎁 Miễn phí vận chuyển đơn từ <strong>500.000đ</strong> — Nhập mã <code class="text-white bg-dark bg-opacity-25 px-2 py-1 rounded">FREESHIP</code> tại checkout (demo).</p>
+</section>
+
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <h2 class="h4 mb-0">Danh mục nổi bật</h2>
+        <a class="small fw-semibold" asp-action="Categories">Tất cả →</a>
+    </div>
+    <div class="row g-3">
+        @foreach (var c in Model.Categories.Take(6))
+        {
+            <div class="col-6 col-md-4 col-lg-2">
+                <a class="text-decoration-none" asp-controller="Products" asp-action="Index" asp-route-categoryId="@c.Id">
+                    <div class="card h-100 border-0 shadow-sm text-center py-4 product-card">
+                        <div class="card-body">
+                            <span class="d-block fs-4 mb-2" aria-hidden="true">📦</span>
+                            <span class="fw-bold text-dark">@c.Name</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="mb-5">
+    <h2 class="h4 mb-3">Sản phẩm nổi bật</h2>
+    <div class="row g-4">
+        @foreach (var p in Model.FeaturedProducts)
+        {
+            <div class="col-6 col-md-4 col-lg-3">
+                <partial name="_ProductCard" model="p" />
+            </div>
+        }
+    </div>
+</section>
+
+<section class="mb-2">
+    <h2 class="h4 mb-3">Mới về</h2>
+    <div class="row g-4">
+        @foreach (var p in Model.NewProducts)
+        {
+            <div class="col-6 col-md-3">
+                <partial name="_ProductCard" model="p" />
+            </div>
+        }
+    </div>
+</section>

@@ -1,0 +1,53 @@
+@{
+    ViewData["Title"] = "Tổng quan";
+    var revenue = Convert.ToDecimal(ViewBag.Revenue ?? 0m);
+}
+
+<h1 class="h3 mb-4">Bảng điều khiển</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+            <div class="card-body">
+                <p class="text-muted small text-uppercase mb-1">Doanh thu (ước tính)</p>
+                <p class="h3 mb-0 text-primary">@revenue.ToString("N0") đ</p>
+                <p class="small text-muted mb-0 mt-2">Đơn COD + đã thanh toán online, không tính đơn hủy.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Sản phẩm</h2>
+                <p class="display-6 mb-0">@ViewBag.ProductCount</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Đơn hàng</h2>
+                <p class="display-6 mb-0">@ViewBag.OrderCount</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Chờ xử lý / thanh toán</h2>
+                <p class="display-6 mb-0 text-warning">@ViewBag.PendingOrders</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h6 text-muted">Người dùng</h2>
+                <p class="display-6 mb-0">@ViewBag.UserCount</p>
+            </div>
+        </div>
+    </div>
+</div>

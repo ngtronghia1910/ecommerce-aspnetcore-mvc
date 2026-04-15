@@ -1,0 +1,84 @@
+@model Product
+@using ECommerceWeb.Models
+@{
+    ViewData["Title"] = Model.Name;
+    var img = string.IsNullOrEmpty(Model.ImageUrl) ? "/images/placeholder-product.svg" : Model.ImageUrl;
+    var auth = User.Identity?.IsAuthenticated == true;
+    var hasDisc = ProductPricing.HasDiscount(Model);
+    var effective = ProductPricing.GetEffectiveUnitPrice(Model);
+    var pct = ProductPricing.GetDiscountPercentDisplay(Model);
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Sản phẩm</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index" asp-route-categoryId="@Model.CategoryId">@Model.Category?.Name</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="row g-4 g-lg-5 align-items-start">
+    <div class="col-md-5 col-lg-4">
+        <div class="position-sticky" style="top: 5.5rem;">
+            <div class="ratio ratio-1x1 rounded-3 overflow-hidden shadow-sm bg-light product-detail-zoom position-relative">
+                @if (hasDisc)
+                {
+                    <span class="badge bg-danger position-absolute top-0 end-0 m-3 fs-6 shadow">−@pct%</span>
+                }
+                <img src="@img" class="w-100 h-100 object-fit-cover" alt="@Model.Name" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7 col-lg-8">
+        <p class="text-secondary small mb-1">@Model.Category?.Name</p>
+        <h1 class="h2 mb-3">@Model.Name</h1>
+        @if (hasDisc)
+        {
+            <p class="mb-1"><del class="text-muted">@Model.Price.ToString("N0") đ</del></p>
+            <p class="price-tag display-6 mb-3">@effective.ToString("N0") <span class="currency">đ</span></p>
+        }
+        else
+        {
+            <p class="price-tag display-6 mb-3">@Model.Price.ToString("N0") <span class="currency">đ</span></p>
+        }
+        <p class="mb-2"><span class="badge bg-secondary bg-opacity-10 text-dark">Tồn kho: @Model.Stock</span></p>
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <div class="card border-0 bg-light mb-4">
+                <div class="card-body">
+                    <h2 class="h6 text-uppercase text-secondary">Mô tả</h2>
+                    <p class="mb-0">@Model.Description</p>
+                </div>
+            </div>
+        }
+        @if (auth && Model.Stock > 0)
+        {
+            <form asp-controller="Cart" asp-action="Add" method="post" class="row g-3 align-items-end" data-loading>
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                <div class="col-auto">
+                    <label for="qty" class="form-label fw-semibold">Số lượng</label>
+                    <input id="qty" type="number" name="quantity" value="1" min="1" max="@Model.Stock" class="form-control" style="width:5.5rem" />
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-cta btn-lg px-5">Thêm vào giỏ hàng</button>
+                </div>
+            </form>
+        }
+        else if (!auth)
+        {
+            <a class="btn btn-cta btn-lg" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)">Đăng nhập để mua</a>
+        }
+        else
+        {
+            <p class="text-muted">Sản phẩm tạm hết hàng.</p>
+        }
+        <p class="mt-4 mb-0"><a asp-action="Index" class="fw-semibold">← Quay lại danh sách</a></p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

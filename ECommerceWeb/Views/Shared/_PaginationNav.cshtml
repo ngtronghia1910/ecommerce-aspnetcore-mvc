@@ -1,0 +1,33 @@
+@model ECommerceWeb.Models.ViewModels.PaginationViewModel
+@if (Model.TotalPages > 1)
+{
+    <nav class="mt-4" aria-label="Phân trang">
+        <ul class="pagination justify-content-center flex-wrap gap-1">
+            <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
+                <a class="page-link rounded-pill" href="@PageUrl(Model.CurrentPage - 1)" tabindex="@(Model.HasPrevious ? 0 : -1)">‹ Trước</a>
+            </li>
+            @for (var i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link rounded-pill" href="@PageUrl(i)">@i</a>
+                </li>
+            }
+            <li class="page-item @(Model.HasNext ? "" : "disabled")">
+                <a class="page-link rounded-pill" href="@PageUrl(Model.CurrentPage + 1)" tabindex="@(Model.HasNext ? 0 : -1)">Sau ›</a>
+            </li>
+        </ul>
+    </nav>
+}
+@functions {
+    string PageUrl(int page)
+    {
+        var parts = new List<string> { $"page={page}" };
+        foreach (var kv in Model.Query)
+        {
+            if (string.IsNullOrEmpty(kv.Value) || kv.Key.Equals("page", StringComparison.OrdinalIgnoreCase))
+                continue;
+            parts.Add($"{Uri.EscapeDataString(kv.Key)}={Uri.EscapeDataString(kv.Value!)}");
+        }
+        return "?" + string.Join("&", parts);
+    }
+}

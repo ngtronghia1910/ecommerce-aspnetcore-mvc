@@ -1,0 +1,14 @@
+@model IList<ECommerceWeb.Models.Category>
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="catMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">Danh mục</a>
+    <ul class="dropdown-menu dropdown-menu-lg-end shadow" aria-labelledby="catMenu">
+        <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">Tất cả sản phẩm</a></li>
+        <li><hr class="dropdown-divider" /></li>
+        @foreach (var c in Model)
+        {
+            <li><a class="dropdown-item" asp-controller="Products" asp-action="Index" asp-route-categoryId="@c.Id">@c.Name</a></li>
+        }
+        <li><hr class="dropdown-divider" /></li>
+        <li><a class="dropdown-item" asp-controller="Home" asp-action="Categories">Xem tất cả danh mục</a></li>
+    </ul>
+</li>

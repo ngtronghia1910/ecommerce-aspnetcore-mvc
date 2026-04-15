@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản trị</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-lg-2 admin-sidebar px-0 d-none d-lg-block">
+                <div class="p-3 pb-4 border-bottom border-secondary border-opacity-25">
+                    <a class="text-white text-decoration-none fw-bold fs-5" asp-area="Admin" asp-controller="Home" asp-action="Index">ShopMVC Admin</a>
+                </div>
+                <nav class="nav flex-column p-3 gap-1">
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString()=="Home" ? "active text-white" : "")" asp-area="Admin" asp-controller="Home" asp-action="Index">Tổng quan</a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString()=="Products" ? "active text-white" : "")" asp-area="Admin" asp-controller="Products" asp-action="Index">Sản phẩm</a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString()=="Categories" ? "active text-white" : "")" asp-area="Admin" asp-controller="Categories" asp-action="Index">Danh mục</a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString()=="Coupons" ? "active text-white" : "")" asp-area="Admin" asp-controller="Coupons" asp-action="Index">Mã giảm giá</a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString()=="Orders" ? "active text-white" : "")" asp-area="Admin" asp-controller="Orders" asp-action="Index">Đơn hàng</a>
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString()=="Users" ? "active text-white" : "")" asp-area="Admin" asp-controller="Users" asp-action="Index">Người dùng</a>
+                </nav>
+            </aside>
+            <div class="col-lg-10 ms-auto">
+                <header class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm sticky-top px-3 py-2">
+                    <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#adminMobileNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="adminMobileNav">
+                        <ul class="navbar-nav d-lg-none flex-column border-top mt-2 pt-2">
+                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Home" asp-action="Index">Tổng quan</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Products" asp-action="Index">Sản phẩm</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Categories" asp-action="Index">Danh mục</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Coupons" asp-action="Index">Mã giảm giá</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Orders" asp-action="Index">Đơn hàng</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="Users" asp-action="Index">Người dùng</a></li>
+                        </ul>
+                    </div>
+                    <div class="ms-auto d-flex gap-2 align-items-center">
+                        <a class="btn btn-sm btn-outline-primary" asp-area="" asp-controller="Home" asp-action="Index">Về cửa hàng</a>
+                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Đăng xuất</button>
+                        </form>
+                    </div>
+                </header>
+                <main class="p-3 p-md-4">
+                    @if (TempData["Message"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show shadow-sm">@TempData["Message"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show shadow-sm">@TempData["Error"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+                    }
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

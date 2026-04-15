@@ -1,0 +1,103 @@
+@model ProductListViewModel
+@{
+    ViewData["Title"] = "Sản phẩm";
+    var paged = Model.Paged;
+}
+
+<h1 class="h3 mb-4">Cửa hàng</h1>
+
+<div class="row g-4">
+    <aside class="col-lg-3">
+        <div class="card border-0 shadow-sm sticky-lg-top" style="top: 5.5rem;">
+            <div class="card-header bg-white fw-bold py-3">Bộ lọc</div>
+            <div class="card-body">
+                <form method="get" id="filterForm" class="d-grid gap-3">
+                    <input type="hidden" name="q" value="@Model.Query" />
+                    <div>
+                        <label class="form-label small fw-semibold">Danh mục</label>
+                        <select name="categoryId" class="form-select form-select-sm" onchange="document.getElementById('filterForm').submit()">
+                            <option value="">Tất cả</option>
+                            @foreach (var c in Model.Categories)
+                            {
+                                if (Model.CategoryId == c.Id)
+                                {
+                                    <option value="@c.Id" selected>@c.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label small fw-semibold">Giá từ (đ)</label>
+                        <input type="number" name="minPrice" class="form-control form-control-sm" min="0" step="1000" value="@(Model.MinPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")" placeholder="Tối thiểu" />
+                    </div>
+                    <div>
+                        <label class="form-label small fw-semibold">Giá đến (đ)</label>
+                        <input type="number" name="maxPrice" class="form-control form-control-sm" min="0" step="1000" value="@(Model.MaxPrice?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "")" placeholder="Tối đa" />
+                    </div>
+                    <div>
+                        <label class="form-label small fw-semibold">Sắp xếp</label>
+                        <select name="sort" class="form-select form-select-sm">
+                            @if (Model.Sort == "newest")
+                            {
+                                <option value="newest" selected>Mới nhất</option>
+                            }
+                            else
+                            {
+                                <option value="newest">Mới nhất</option>
+                            }
+                            @if (Model.Sort == "price_asc")
+                            {
+                                <option value="price_asc" selected>Giá tăng dần</option>
+                            }
+                            else
+                            {
+                                <option value="price_asc">Giá tăng dần</option>
+                            }
+                            @if (Model.Sort == "price_desc")
+                            {
+                                <option value="price_desc" selected>Giá giảm dần</option>
+                            }
+                            else
+                            {
+                                <option value="price_desc">Giá giảm dần</option>
+                            }
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-brand btn-sm">Áp dụng</button>
+                    <a class="btn btn-outline-secondary btn-sm" asp-action="Index">Xóa bộ lọc</a>
+                </form>
+            </div>
+        </div>
+    </aside>
+    <div class="col-lg-9">
+        @if (!string.IsNullOrWhiteSpace(Model.Query))
+        {
+            <p class="text-secondary small mb-3">Kết quả tìm kiếm: <strong>@Model.Query</strong></p>
+        }
+        @if (!paged.Items.Any())
+        {
+            <div class="empty-state card border-0 shadow-sm">
+                <div class="empty-state-icon" aria-hidden="true">🛒</div>
+                <h2 class="h5 text-dark">Không có sản phẩm</h2>
+                <p class="mb-3">Thử đổi bộ lọc hoặc từ khóa khác.</p>
+                <a class="btn btn-brand" asp-action="Index">Xem tất cả</a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var p in paged.Items)
+                {
+                    <div class="col-6 col-md-4">
+                        <partial name="_ProductCard" model="p" />
+                    </div>
+                }
+            </div>
+            <partial name="_PaginationNav" model="Model.Pagination" />
+        }
+    </div>
+</div>

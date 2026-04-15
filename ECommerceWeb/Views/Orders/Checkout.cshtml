@@ -1,0 +1,153 @@
+@model CheckoutViewModel
+@using ECommerceWeb.Models
+@{
+    ViewData["Title"] = "Thanh toán";
+    var vnp = ViewBag.VnpayReady as bool? ?? false;
+    var momo = ViewBag.MomoReady as bool? ?? false;
+    var namePayment = Html.NameFor(m => m.PaymentKind);
+    var preview = ViewBag.CartPreview as IList<ECommerceWeb.Models.CartItem>;
+    var subtotal = ViewBag.Subtotal as decimal? ?? 0m;
+    var couponDiscount = ViewBag.CouponDiscount as decimal? ?? 0m;
+    var grandTotal = ViewBag.GrandTotal as decimal? ?? subtotal;
+    var appliedCode = ViewBag.AppliedCouponCode as string;
+    var couponErr = ViewBag.CouponError as string;
+}
+
+<h1 class="h3 mb-4">Thanh toán</h1>
+
+<div class="row g-4">
+    <div class="col-lg-7 order-lg-2">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 fw-bold">Tóm tắt đơn hàng</div>
+            <div class="card-body">
+                @if (preview != null)
+                {
+                    <ul class="list-group list-group-flush mb-3">
+                        @foreach (var line in preview)
+                        {
+                            var p = line.Product!;
+                            var unit = ProductPricing.GetEffectiveUnitPrice(p);
+                            <li class="list-group-item d-flex justify-content-between align-items-start px-0">
+                                <div>
+                                    <span class="fw-semibold">@p.Name</span>
+                                    <span class="text-secondary small d-block">× @line.Quantity</span>
+                                </div>
+                                <span class="text-brand fw-bold">@((unit * line.Quantity).ToString("N0")) đ</span>
+                            </li>
+                        }
+                    </ul>
+                }
+
+                <div class="border rounded p-3 mb-3 bg-light bg-opacity-50">
+                    <label class="form-label small fw-semibold text-secondary mb-2">Mã giảm giá</label>
+                    @if (!string.IsNullOrEmpty(couponErr))
+                    {
+                        <div class="alert alert-warning py-2 small mb-2" role="alert">@couponErr</div>
+                    }
+                    @if (!string.IsNullOrEmpty(appliedCode))
+                    {
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-0">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">@appliedCode</span>
+                            <form asp-controller="Orders" asp-action="RemoveCoupon" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Gỡ mã</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <form asp-controller="Orders" asp-action="ApplyCoupon" method="post" class="d-flex flex-wrap gap-2">
+                            @Html.AntiForgeryToken()
+                            <input type="text" name="couponCode" class="form-control form-control-sm flex-grow-1" maxlength="40" placeholder="VD: SALE10" autocomplete="off" value="@Model.CouponCodeInput" />
+                            <button type="submit" class="btn btn-sm btn-brand">Áp dụng</button>
+                        </form>
+                    }
+                </div>
+
+                <div class="d-flex justify-content-between text-secondary small mb-1">
+                    <span>Tạm tính</span>
+                    <span>@subtotal.ToString("N0") đ</span>
+                </div>
+                @if (couponDiscount > 0)
+                {
+                    <div class="d-flex justify-content-between text-success small mb-2">
+                        <span>Giảm giá (mã)</span>
+                        <span>−@couponDiscount.ToString("N0") đ</span>
+                    </div>
+                }
+                <div class="d-flex justify-content-between fs-5 fw-bold border-top pt-3">
+                    <span>Thành tiền</span>
+                    <span class="text-brand">@grandTotal.ToString("N0") đ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5 order-lg-1">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 fw-bold">Thông tin giao hàng</div>
+            <div class="card-body p-4">
+                <form asp-controller="Orders" asp-action="Checkout" method="post" novalidate data-loading>
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+                    <div class="mb-3">
+                        <label asp-for="ShippingName" class="form-label"></label>
+                        <input asp-for="ShippingName" class="form-control" autocomplete="name" />
+                        <span asp-validation-for="ShippingName" class="field-validation-error"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ShippingPhone" class="form-label"></label>
+                        <input asp-for="ShippingPhone" class="form-control" autocomplete="tel" />
+                        <span asp-validation-for="ShippingPhone" class="field-validation-error"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ShippingAddress" class="form-label"></label>
+                        <textarea asp-for="ShippingAddress" class="form-control" rows="3" autocomplete="street-address"></textarea>
+                        <span asp-validation-for="ShippingAddress" class="field-validation-error"></span>
+                    </div>
+
+                    <fieldset class="mb-4">
+                        <legend class="form-label fw-semibold">@Html.DisplayNameFor(m => m.PaymentKind)</legend>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="@namePayment" value="@((int)CheckoutPaymentKind.Cod)" id="payCod" checked="@(Model.PaymentKind == CheckoutPaymentKind.Cod)" />
+                            <label class="form-check-label" for="payCod">Thanh toán khi nhận hàng (COD)</label>
+                        </div>
+                        <div class="form-check">
+                            @if (vnp)
+                            {
+                                <input class="form-check-input" type="radio" name="@namePayment" value="@((int)CheckoutPaymentKind.VNPay)" id="payVnp" checked="@(Model.PaymentKind == CheckoutPaymentKind.VNPay)" />
+                            }
+                            else
+                            {
+                                <input class="form-check-input" type="radio" name="@namePayment" value="@((int)CheckoutPaymentKind.VNPay)" id="payVnp" disabled />
+                            }
+                            <label class="form-check-label" for="payVnp">VNPay @if (!vnp) { <span class="text-muted">(chưa cấu hình)</span> }</label>
+                        </div>
+                        <div class="form-check">
+                            @if (momo)
+                            {
+                                <input class="form-check-input" type="radio" name="@namePayment" value="@((int)CheckoutPaymentKind.Momo)" id="payMomo" checked="@(Model.PaymentKind == CheckoutPaymentKind.Momo)" />
+                            }
+                            else
+                            {
+                                <input class="form-check-input" type="radio" name="@namePayment" value="@((int)CheckoutPaymentKind.Momo)" id="payMomo" disabled />
+                            }
+                            <label class="form-check-label" for="payMomo">Ví MoMo @if (!momo) { <span class="text-muted">(chưa cấu hình)</span> }</label>
+                        </div>
+                        <span asp-validation-for="PaymentKind" class="field-validation-error d-block"></span>
+                        @if (!vnp || !momo)
+                        {
+                            <p class="small text-muted mt-2 mb-0">Cấu hình sandbox trong <code>appsettings.json</code> để bật VNPay/MoMo.</p>
+                        }
+                    </fieldset>
+
+                    <button type="submit" class="btn btn-cta w-100 mb-2">Đặt hàng</button>
+                    <a class="btn btn-outline-secondary w-100" asp-controller="Cart" asp-action="Index">Quay lại giỏ</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

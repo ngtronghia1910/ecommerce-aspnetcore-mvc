@@ -1,0 +1,56 @@
+@model ProductFormViewModel
+@{
+    ViewData["Title"] = "Sửa sản phẩm";
+    var cats = ViewBag.Categories as IList<Category> ?? Array.Empty<Category>();
+}
+
+<h1 class="h4">Sửa sản phẩm</h1>
+<form asp-action="Edit" method="post" enctype="multipart/form-data" class="col-lg-8">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Price" class="form-label"></label>
+            <input asp-for="Price" class="form-control" />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Stock" class="form-label"></label>
+            <input asp-for="Stock" class="form-control" />
+            <span asp-validation-for="Stock" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="DiscountPercent" class="form-label"></label>
+            <input asp-for="DiscountPercent" class="form-control" placeholder="0 = không giảm" />
+            <span asp-validation-for="DiscountPercent" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId" class="form-select"
+                asp-items="@(new SelectList(cats, "Id", "Name"))"></select>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.ExistingImageUrl))
+    {
+        <p>Ảnh hiện tại: <img src="@Model.ExistingImageUrl" alt="" class="img-thumbnail" style="max-height:80px" /></p>
+    }
+    <div class="mb-3">
+        <label asp-for="ImageFile" class="form-label"></label>
+        <input asp-for="ImageFile" type="file" accept="image/*" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Cập nhật</button>
+    <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

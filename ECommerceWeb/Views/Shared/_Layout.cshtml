@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ShopMVC</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <a class="visually-hidden-focusable skip-link p-2 position-absolute bg-white shadow" href="#main-content">Bỏ qua đến nội dung</a>
+
+    <header class="site-header sticky-top shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-dark py-2">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" asp-controller="Home" asp-action="Index" aria-label="Trang chủ ShopMVC">
+                    <span class="brand-mark" aria-hidden="true"></span>
+                    <span>ShopMVC</span>
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Mở menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <form asp-controller="Products" asp-action="Index" method="get" class="d-flex flex-grow-1 mx-lg-4 my-3 my-lg-0" role="search">
+                        <label for="navSearch" class="visually-hidden">Tìm sản phẩm</label>
+                        <input id="navSearch" type="search" name="q" class="form-control form-control-nav" placeholder="Tìm sản phẩm..." value="@(Context.Request.Query.TryGetValue("q", out var sq) ? sq.ToString() : "")" autocomplete="off" />
+                        <button class="btn btn-nav-search ms-2" type="submit">Tìm</button>
+                    </form>
+                    <ul class="navbar-nav align-items-lg-center gap-lg-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Products" asp-action="Index">Sản phẩm</a>
+                        </li>
+                        @await Component.InvokeAsync("CategoryMenu")
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Contact" asp-action="Index">Liên hệ</a>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-cart position-relative d-inline-flex align-items-center gap-1" asp-controller="Cart" asp-action="Index" aria-label="Giỏ hàng">
+                                    <span class="cart-icon" aria-hidden="true"></span>
+                                    <span class="d-lg-none">Giỏ hàng</span>
+                                    @await Component.InvokeAsync("CartCount")
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">Tài khoản</a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userMenu">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Thông tin cá nhân</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Orders" asp-action="MyOrders">Đơn hàng của tôi</a></li>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li><a class="dropdown-item text-warning" asp-area="Admin" asp-controller="Home" asp-action="Index">Quản trị</a></li>
+                                    }
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="px-3">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-link dropdown-item text-danger p-0">Đăng xuất</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Login">Đăng nhập</a></li>
+                            <li class="nav-item"><a class="nav-link btn btn-sm btn-outline-light ms-lg-2 rounded-pill px-3" asp-controller="Account" asp-action="Register">Đăng ký</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div id="page-loader" class="page-loader d-none" aria-hidden="true" aria-live="polite">
+        <div class="spinner-border text-brand" role="status"><span class="visually-hidden">Đang tải…</span></div>
+    </div>
+
+    <main id="main-content" class="container py-4 flex-grow-1" tabindex="-1">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer mt-auto">
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h2 class="h6 text-uppercase text-brand-accent mb-3">Liên hệ</h2>
+                    <p class="small mb-1"><strong>Hotline:</strong> 1900 0000</p>
+                    <p class="small mb-1"><strong>Email:</strong> <a href="mailto:support@shopmvc.local">support@shopmvc.local</a></p>
+                    <p class="small text-secondary mb-0">Hà Nội, Việt Nam</p>
+                </div>
+                <div class="col-md-4">
+                    <h2 class="h6 text-uppercase text-brand-accent mb-3">Chính sách</h2>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2"><a asp-controller="Home" asp-action="ReturnPolicy">Đổi trả &amp; hoàn tiền</a></li>
+                        <li class="mb-2"><a asp-controller="Home" asp-action="Privacy">Bảo mật thông tin</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h2 class="h6 text-uppercase text-brand-accent mb-3">Mạng xã hội</h2>
+                    <div class="d-flex gap-3">
+                        <a class="social-link" href="#" aria-label="Facebook">FB</a>
+                        <a class="social-link" href="#" aria-label="Instagram">IG</a>
+                        <a class="social-link" href="#" aria-label="YouTube">YT</a>
+                    </div>
+                </div>
+            </div>
+            <hr class="border-secondary opacity-25 my-4" />
+            <p class="small text-center text-secondary mb-0">&copy; @DateTime.UtcNow.Year ShopMVC. ASP.NET Core MVC — Demo thương mại điện tử.</p>
+        </div>
+    </footer>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1090" role="region" aria-label="Thông báo">
+        @if (TempData["Message"] != null)
+        {
+            <div class="toast align-items-center text-bg-success border-0" role="status" data-bs-delay="4500" data-toast-auto>
+                <div class="d-flex">
+                    <div class="toast-body">@TempData["Message"]</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Đóng"></button>
+                </div>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="toast align-items-center text-bg-danger border-0" role="alert" data-bs-delay="6000" data-toast-auto>
+                <div class="d-flex">
+                    <div class="toast-body">@TempData["Error"]</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Đóng"></button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
